@@ -7,8 +7,8 @@ async def handler(request):
   payload = data.get("payload")
   return web.Response()
 
-async def start_server():
-  """Start the API server."""
+async def run():
+  """Run the API server."""
   server = web.Server(handler)
   runner = server.ServerRunner()
   await runner.setup()
