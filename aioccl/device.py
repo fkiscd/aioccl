@@ -13,7 +13,7 @@ CCL_DEVICE_INFO_TYPES = ("serial_no", "mac_address", "model", "version")
 
 class CCLDevice:
     def __init__(self, passkey: str):
-        """Initialize a CCLDevice."""
+        """Initialize a CCL device."""
         _LOGGER.debug('Initializing CCL Device: %s', self)
         self._passkey = passkey
         
