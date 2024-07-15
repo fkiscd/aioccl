@@ -25,7 +25,7 @@ class CCLServer:
     routes = web.RouteTableDef()
 
     async def _handler(request: web.BaseRequest) -> web.Response:
-        """Handle POST requests for updating."""
+        """Handle POST requests for data updating."""
         class HandlerStorage:
             body: dict[str, None | str | int | float]
             info: dict[str, None | str]
@@ -108,5 +108,5 @@ class CCLServer:
             _LOGGER.debug("Successfully started the API server.")
 
     async def stop() -> None:
-        """ """
+        """Stop running the API server."""
         await CCLServer.runner.cleanup()
