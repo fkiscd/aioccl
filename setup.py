@@ -7,7 +7,7 @@ setup(
   packages=find_packages(exclude=["tests", "misc"]),
   version=VERSION,
   license="Apache License, Version 2.0",
-  description="Python library of CCL API Server",
+  description="A Python library for CCL API server",
   author="fkiscd",
   author_email = "fkiscd@gmail.com",
   url="https://github.com/fkiscd/aioccl",
