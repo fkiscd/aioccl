@@ -5,7 +5,6 @@ VERSION = "2024.7"
 
 ROOT_DIR = Path(__file__).parent.resolve()
 
-
 setup(
   name = "aioccl",
   packages=find_packages(exclude=["tests", "misc"]),
