@@ -1,6 +1,10 @@
+from pathlib import Path
 from setuptools import find_packages, setup
 
 VERSION = "2024.7"
+
+ROOT_DIR = Path(__file__).parent.resolve()
+
 
 setup(
   name = "aioccl",
@@ -8,8 +12,10 @@ setup(
   version=VERSION,
   license="Apache License, Version 2.0",
   description="A Python library for CCL API server",
+  long_description=(ROOT_DIR / "README.md").read_text(encoding="utf-8"),
+  long_description_content_type="text/markdown",
   author="fkiscd",
-  author_email = "fkiscd@gmail.com",
+  author_email="fkiscd@gmail.com",
   url="https://github.com/fkiscd/aioccl",
   download_url="https://github.com/fkiscd/aioccl",
   install_requires=[
