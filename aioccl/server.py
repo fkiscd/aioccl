@@ -8,7 +8,7 @@ from aiohttp import web
 import aiohttp_cors
 
 from .device import CCLDevice, CCL_DEVICE_INFO_TYPES
-from .ccl_sensor import CCL_SENSORS
+from .sensor import CCL_SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
