@@ -5,7 +5,7 @@ import logging
 import time
 from typing import Callable
 
-from .sensor import CCLSensor
+from .sensor import CCLSensor, CCL_SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,14 +17,13 @@ class CCLDevice:
         _LOGGER.debug('Initializing CCL Device: %s', self)
         self._passkey = passkey
         
-        self.serial_no: str | None
-        self.mac_address: str | None
-        self.model: str | None
-        self.version: str | None
-
-        self.last_updated_time: float = -10.0 # Offset
-        
-        self.sensors: dict[str, CCLSensor] | None = {}
+        self._serial_no: str | None
+        self._mac_address: str | None
+        self._model: str | None
+        self._version: str | None
+        self._binary_sensors: dict[str, CCLSensor] | None = {}
+        self._sensors: dict[str, CCLSensor] | None = {}
+        self.last_updated_time: float | None
 
         self._new_sensors: list[CCLSensor] | None = []
         
@@ -36,26 +35,56 @@ class CCLDevice:
         return self._passkey
     
     @property
-    def device_id(self) -> str:
-        return self.mac_address.replace(":", "").lower()[-6:]
+    def device_id(self) -> str | None:
+        return self._mac_address.replace(":", "").lower()[-6:]
+    
+    @property
+    def serial_no(self) -> str | None:
+        return self._serial_no
+    
+    @property
+    def mac_address(self) -> str | None:
+        return self._mac_address
+    
+    @property
+    def model(self) -> str | None:
+        return self._model
+    
+    @property
+    def version(self) -> str | None:
+        return self._version
+    
+    @property
+    def binary_sensors(self) -> dict[str, CCLSensor] | None:
+        return self._binary_sensors
+    
+    @property
+    def sensors(self) -> dict[str, CCLSensor] | None:
+        return self._sensors
     
     def update_info(self, info: dict[str, None | str]) -> None:
         """Add or update device info."""
-        self.serial_no = info.get('serial_no')
-        self.mac_address = info.get('mac_address')
-        self.model = info.get('model')
-        self.version = info.get('version')
+        self._serial_no = info.get('serial_no')
+        self._mac_address = info.get('mac_address')
+        self._model = info.get('model')
+        self._version = info.get('version')
     
     def update_sensors(self, sensors: dict[str, None | str | int | float]) -> None:
         """Add or update all sensor values."""
-        for sensor, value in sensors.items():
-            if not self.sensors.get(sensor):
-                self.sensors[sensor] = CCLSensor(sensor)
-                self._new_sensors.append(self.sensors[sensor])
-            self.sensors[sensor].value = value
+        for key, value in sensors.items():
+            if CCL_SENSORS[key].binary:
+                if not self._binary_sensors.get(key):
+                    self._binary_sensors[key] = CCLSensor(key)
+                    self._new_sensors.append(self._binary_sensors[key])
+                self._binary_sensors[key].value = value
+            else:
+                if not self._sensors.get(key):
+                    self._sensors[key] = CCLSensor(key)
+                    self._new_sensors.append(self.sensors[key])
+                self._sensors[key].value = value
         self._publish_new_sensors()
         self._publish_updates()
-        self.last_updated_time = time.monotonic()
+        self._last_updated_time = time.monotonic()
         _LOGGER.debug("Sensors Updated: %s", self.last_updated_time)
 
     def register_update_cb(self, callback: Callable[[], None]) -> None:
@@ -87,7 +116,6 @@ class CCLDevice:
         try:
             for sensor in self._new_sensors:
                 _LOGGER.debug("Publishing new sensor: %s", sensor)
-                _LOGGER.debug("Sensors remaining: %s", self._new_sensors)
                 for callback in self._new_sensor_callbacks:
                     callback(sensor)
             self._new_sensors.clear()
