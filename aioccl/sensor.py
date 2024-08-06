@@ -87,4 +87,9 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
     't234c1bat': CCLSensorPreset('CH1 Battery', CCLSensorTypes.BATTERY_BINARY, True),
     't234c1cn': CCLSensorPreset('CH1 Connection', CCLSensorTypes.CONNECTION, True),
     't234c1tp': CCLSensorPreset('CH1 Sensor Type', CCLSensorTypes.CH_SENSOR_TYPE),
+    't234c2tem': CCLSensorPreset('CH2 Temperature', CCLSensorTypes.TEMPERATURE),
+    't234c2hum': CCLSensorPreset('CH2 Humidity', CCLSensorTypes.HUMIDITY),
+    't234c2bat': CCLSensorPreset('CH2 Battery', CCLSensorTypes.BATTERY_BINARY, True),
+    't234c2cn': CCLSensorPreset('CH2 Connection', CCLSensorTypes.CONNECTION, True),
+    't234c2tp': CCLSensorPreset('CH2 Sensor Type', CCLSensorTypes.CH_SENSOR_TYPE),
 }
