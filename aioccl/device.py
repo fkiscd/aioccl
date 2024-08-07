@@ -28,6 +28,7 @@ class CCLDevice:
         self._new_sensors: list[CCLSensor] | None = []
         
         self._update_callbacks = set() 
+        self._new_binary_sensor_callbacks = set()
         self._new_sensor_callbacks = set()
     
     @property
@@ -72,13 +73,13 @@ class CCLDevice:
     def update_sensors(self, sensors: dict[str, None | str | int | float]) -> None:
         """Add or update all sensor values."""
         for key, value in sensors.items():
-            if CCL_SENSORS[key].binary:
-                if not self._binary_sensors.get(key):
+            if CCL_SENSORS.get(key).binary:
+                if not key in self._binary_sensors:
                     self._binary_sensors[key] = CCLSensor(key)
                     self._new_sensors.append(self._binary_sensors[key])
                 self._binary_sensors[key].value = value
             else:
-                if not self._sensors.get(key):
+                if not key in self._sensors:
                     self._sensors[key] = CCLSensor(key)
                     self._new_sensors.append(self._sensors[key])
                 self._sensors[key].value = value
@@ -103,6 +104,14 @@ class CCLDevice:
         except Exception as err:
             _LOGGER.warning("Error while publishing sensor updates: %s", err)
 
+    def register_new_binary_sensor_cb(self, callback: Callable[[], None]) -> None:
+        """Register callback, called when Sensor changes state."""
+        self._new_binary_sensor_callbacks.add(callback)
+
+    def remove_new_binary_sensor_cb(self, callback: Callable[[], None]) -> None:
+        """Remove previously registered callback."""
+        self._new_binary_sensor_callbacks.discard(callback)
+
     def register_new_sensor_cb(self, callback: Callable[[], None]) -> None:
         """Register callback, called when Sensor changes state."""
         self._new_sensor_callbacks.add(callback)
@@ -113,11 +122,15 @@ class CCLDevice:
 
     def _publish_new_sensors(self) -> None:
         """Schedule call all registered callbacks."""
-        try:
-            for sensor in self._new_sensors:
+        for sensor in self._new_sensors:
+            try:
                 _LOGGER.debug("Publishing new sensor: %s", sensor)
-                for callback in self._new_sensor_callbacks:
-                    callback(sensor)
-            self._new_sensors.clear()
-        except Exception as err:
-            _LOGGER.warning("Error while publishing new sensors: %s", err)
+                if sensor.binary:
+                    for callback in self._new_binary_sensor_callbacks:
+                        callback(sensor)
+                else:
+                    for callback in self._new_sensor_callbacks:
+                        callback(sensor)
+                self._new_sensors.remove(sensor)
+            except Exception as err:
+                _LOGGER.warning("Error while publishing new sensors: %s", err)
