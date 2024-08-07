@@ -35,6 +35,10 @@ class CCLSensor:
         if self.sensor_type == CCLSensorTypes.CH_SENSOR_TYPE:
             return CCL_CH_SENSOR_TYPES[self.sensor_type]
         return self._value
+    
+    @value.setter
+    def value(self, new_value):
+        self._value = new_value
 
 @dataclass
 class CCLSensorPreset:
