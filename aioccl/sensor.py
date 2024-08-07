@@ -33,7 +33,7 @@ class CCLSensor:
     @property
     def value(self):
         if self.sensor_type == CCLSensorTypes.CH_SENSOR_TYPE:
-            return CCL_CH_SENSOR_TYPES[self.sensor_type]
+            return CCL_CH_SENSOR_TYPES.get(self._value)
         return self._value
     
     @value.setter
@@ -60,7 +60,11 @@ class CCLSensorTypes(enum.Enum):
     CONNECTION = 11
     CH_SENSOR_TYPE = 12
     
-CCL_CH_SENSOR_TYPES: list[str] = [None, None, 'Thermo-Hygro', 'Pool', 'Soil']
+CCL_CH_SENSOR_TYPES: dict[int, str] = {
+    2: 'Thermo-Hygro',
+    3: 'Pool',
+    4: 'Soil',
+}
     
 CCL_SENSORS: dict[str, CCLSensorPreset] = {
     'rbar': CCLSensorPreset('Relative Pressure', CCLSensorTypes.PRESSURE),
