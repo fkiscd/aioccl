@@ -23,7 +23,7 @@ class CCLDevice:
         self._version: str | None
         self._binary_sensors: dict[str, CCLSensor] | None = {}
         self._sensors: dict[str, CCLSensor] | None = {}
-        self.last_updated_time: float | None
+        self._last_updated_time: float | None
 
         self._new_sensors: list[CCLSensor] | None = []
         
