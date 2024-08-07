@@ -85,7 +85,7 @@ class CCLDevice:
         self._publish_new_sensors()
         self._publish_updates()
         self._last_updated_time = time.monotonic()
-        _LOGGER.debug("Sensors Updated: %s", self.last_updated_time)
+        _LOGGER.debug("Sensors Updated: %s", self._last_updated_time)
 
     def register_update_cb(self, callback: Callable[[], None]) -> None:
         """Register callback, called when Sensor changes state."""
