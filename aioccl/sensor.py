@@ -63,9 +63,11 @@ class CCLSensorTypes(enum.Enum):
 CCL_CH_SENSOR_TYPES: list[str] = [None, None, 'Thermo-Hygro', 'Pool', 'Soil']
     
 CCL_SENSORS: dict[str, CCLSensorPreset] = {
-    'rbar': CCLSensorPreset('Air Pressure', CCLSensorTypes.PRESSURE),
+    'rbar': CCLSensorPreset('Relative Pressure', CCLSensorTypes.PRESSURE),
+    'abar': CCLSensorPreset('Absolute Pressure', CCLSensorTypes.PRESSURE),
     'intem': CCLSensorPreset('Indoor Temperature', CCLSensorTypes.TEMPERATURE),
     'inhum': CCLSensorPreset('Indoor Humidity', CCLSensorTypes.HUMIDITY),
+    'inbat': CCLSensorPreset('Console Battery', CCLSensorTypes.BATTERY_BINARY, True),
     't1tem': CCLSensorPreset('Outdoor Temperature', CCLSensorTypes.TEMPERATURE),
     't1hum': CCLSensorPreset('Outdoor Humidity', CCLSensorTypes.HUMIDITY),
     't1wdir': CCLSensorPreset('Wind Direction', CCLSensorTypes.WIND_DIRECITON),
