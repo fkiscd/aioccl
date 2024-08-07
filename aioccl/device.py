@@ -80,7 +80,7 @@ class CCLDevice:
             else:
                 if not self._sensors.get(key):
                     self._sensors[key] = CCLSensor(key)
-                    self._new_sensors.append(self.sensors[key])
+                    self._new_sensors.append(self._sensors[key])
                 self._sensors[key].value = value
         self._publish_new_sensors()
         self._publish_updates()
