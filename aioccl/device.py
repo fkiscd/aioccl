@@ -20,7 +20,7 @@ class CCLDevice:
         self._serial_no: str | None
         self._mac_address: str | None
         self._model: str | None
-        self._version: str | None
+        self._fw_ver: str | None
         self._binary_sensors: dict[str, CCLSensor] | None = {}
         self._sensors: dict[str, CCLSensor] | None = {}
         self._last_updated_time: float | None
@@ -40,6 +40,10 @@ class CCLDevice:
         return self._mac_address.replace(":", "").lower()[-6:]
     
     @property
+    def name(self) -> str | None:
+        return self._model + " - " + self.device_id
+    
+    @property
     def serial_no(self) -> str | None:
         return self._serial_no
     
@@ -52,8 +56,8 @@ class CCLDevice:
         return self._model
     
     @property
-    def version(self) -> str | None:
-        return self._version
+    def fw_ver(self) -> str | None:
+        return self._fw_ver
     
     @property
     def binary_sensors(self) -> dict[str, CCLSensor] | None:
@@ -122,7 +126,7 @@ class CCLDevice:
 
     def _publish_new_sensors(self) -> None:
         """Schedule call all registered callbacks."""
-        for sensor in self._new_sensors:
+        for sensor in self._new_sensors[:]:
             try:
                 _LOGGER.debug("Publishing new sensor: %s", sensor)
                 if sensor.binary:

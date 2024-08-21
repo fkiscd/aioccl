@@ -22,7 +22,7 @@ class CCLServer:
         CCLServer.devices.setdefault(device.passkey, device)
         _LOGGER.debug(CCLServer.devices)
 
-    routes = web.RouteTableDef()
+    #routes = web.RouteTableDef()
 
     async def _handler(request: web.BaseRequest) -> web.Response:
         """Handle POST requests for data updating."""
@@ -54,6 +54,7 @@ class CCLServer:
             assert 0 < request.content_length <= 5000, 400
             
             HandlerStorage.body = await request.json()
+            _LOGGER.debug(HandlerStorage.body)
             
         except Exception as err:
             _status = err.args[0]
@@ -80,7 +81,7 @@ class CCLServer:
         finally:
             return web.Response(status=_status, text=_text)
 
-    app = web.Application()
+    #app = web.Application()
 
     cors = aiohttp_cors.setup(app)
 
