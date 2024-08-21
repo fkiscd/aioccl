@@ -72,7 +72,7 @@ class CCLDevice:
         self._serial_no = info.get('serial_no')
         self._mac_address = info.get('mac_address')
         self._model = info.get('model')
-        self._version = info.get('version')
+        self._fw_ver = info.get('fw_ver')
     
     def update_sensors(self, sensors: dict[str, None | str | int | float]) -> None:
         """Add or update all sensor values."""

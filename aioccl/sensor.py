@@ -27,8 +27,9 @@ class CCLSensor:
         return CCL_SENSORS[self._key].sensor_type
     
     @property
-    def compartment(self) -> str:
-        return CCL_SENSORS[self._key].compartment.value
+    def compartment(self) -> None | str:
+        if CCL_SENSORS[self._key].compartment is not None:
+            return CCL_SENSORS[self._key].compartment.value
     
     @property
     def binary(self) -> bool:
@@ -50,7 +51,7 @@ class CCLSensor:
 class CCLSensorPreset:
     name: str
     sensor_type: str
-    compartment: str = None
+    compartment: None | CCLDeviceCompartment = None
     binary: bool = False
     
 class CCLSensorTypes(enum.Enum):
