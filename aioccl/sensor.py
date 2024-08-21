@@ -38,7 +38,7 @@ class CCLSensor:
     def value(self):
         if self.sensor_type == CCLSensorTypes.CH_SENSOR_TYPE:
             return CCL_CH_SENSOR_TYPES.get(self._value)
-        elif self.sensor_type == CCLSensorTypes.VOC:
+        elif self.sensor_type in CCL_LEVEL_SENSORS:
             return 'Lv ' + self._value
         return self._value
     
@@ -50,7 +50,7 @@ class CCLSensor:
 class CCLSensorPreset:
     name: str
     sensor_type: str
-    compartment: str
+    compartment: str = None
     binary: bool = False
     
 class CCLSensorTypes(enum.Enum):
@@ -85,7 +85,7 @@ CCL_CH_SENSOR_TYPES: dict[str, str] = {
     '3': 'Pool',
     '4': 'Soil',
 }
-    
+
 CCL_SENSORS: dict[str, CCLSensorPreset] = {
     # Main Sensors 12-34
     'abar': CCLSensorPreset('Air Pressure (Absolute)', CCLSensorTypes.PRESSURE),
@@ -105,20 +105,21 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
     't1raindy': CCLSensorPreset('Rainfall: Daily', CCLSensorTypes.RAINFALL),
     't1rainwy': CCLSensorPreset('Rainfall: Weekly', CCLSensorTypes.RAINFALL),
     't1rainmth': CCLSensorPreset('Rainfall: Monthly', CCLSensorTypes.RAINFALL),
+    't1rainyr': CCLSensorPreset('Rainfall: Yearly', CCLSensorTypes.RAINFALL),
     't1uvi': CCLSensorPreset('UV Index', CCLSensorTypes.UVI),
     't1wdir': CCLSensorPreset('Wind Direction', CCLSensorTypes.WIND_DIRECITON),
     't1wgust': CCLSensorPreset('Wind Gust', CCLSensorTypes.WIND_SPEED),
     't1ws': CCLSensorPreset('Wind Speed', CCLSensorTypes.WIND_SPEED),
     't1ws10mav': CCLSensorPreset('Wind Speed (10 mins AVG.)', CCLSensorTypes.WIND_SPEED),
     # Additional Sensors 35-77
-    't11co': CCLSensorPreset('Air quality: CO', CCLSensorTypes.CO, CCLDeviceCompartment.ADDITIONAL),
-    't10co2': CCLSensorPreset('Air quality: CO\u2082', CCLSensorTypes.CO2, CCLDeviceCompartment.ADDITIONAL),
-    't9hcho': CCLSensorPreset('Air quality: Formaldehyde', CCLSensorTypes.VOLATILE, CCLDeviceCompartment.ADDITIONAL),
-    't8pm10': CCLSensorPreset('Air quality: PM10', CCLSensorTypes.PM10, CCLDeviceCompartment.ADDITIONAL),
-    't8pm10ai': CCLSensorPreset('Air quality: PM10 AQI', CCLSensorTypes.AQI, CCLDeviceCompartment.ADDITIONAL),
-    't8pm25': CCLSensorPreset('Air quality: PM2.5', CCLSensorTypes.PM25, CCLDeviceCompartment.ADDITIONAL),
-    't8pm25ai': CCLSensorPreset('Air quality: PM2.5 AQI', CCLSensorTypes.AQI, CCLDeviceCompartment.ADDITIONAL),
-    't9voclv': CCLSensorPreset('Air quality: VOC Level', CCLSensorTypes.VOC, CCLDeviceCompartment.ADDITIONAL),
+    't11co': CCLSensorPreset('Air Quality: CO', CCLSensorTypes.CO, CCLDeviceCompartment.ADDITIONAL),
+    't10co2': CCLSensorPreset('Air Quality: CO\u2082', CCLSensorTypes.CO2, CCLDeviceCompartment.ADDITIONAL),
+    't9hcho': CCLSensorPreset('Air Quality: Formaldehyde', CCLSensorTypes.VOLATILE, CCLDeviceCompartment.ADDITIONAL),
+    't8pm10': CCLSensorPreset('Air Quality: PM10', CCLSensorTypes.PM10, CCLDeviceCompartment.ADDITIONAL),
+    't8pm10ai': CCLSensorPreset('Air Quality: PM10 AQI', CCLSensorTypes.AQI, CCLDeviceCompartment.ADDITIONAL),
+    't8pm25': CCLSensorPreset('Air Quality: PM2.5', CCLSensorTypes.PM25, CCLDeviceCompartment.ADDITIONAL),
+    't8pm25ai': CCLSensorPreset('Air Quality: PM2.5 AQI', CCLSensorTypes.AQI, CCLDeviceCompartment.ADDITIONAL),
+    't9voclv': CCLSensorPreset('Air Quality: VOC Level', CCLSensorTypes.VOC, CCLDeviceCompartment.ADDITIONAL),
     't234c1tem': CCLSensorPreset('CH1 Temperature', CCLSensorTypes.TEMPERATURE, CCLDeviceCompartment.ADDITIONAL),
     't234c1hum': CCLSensorPreset('CH1 Humidity', CCLSensorTypes.HUMIDITY, CCLDeviceCompartment.ADDITIONAL),
     't234c1tp': CCLSensorPreset('CH1 Type', CCLSensorTypes.CH_SENSOR_TYPE, CCLDeviceCompartment.ADDITIONAL),
@@ -140,7 +141,7 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
     't234c7tem': CCLSensorPreset('CH7 Temperature', CCLSensorTypes.TEMPERATURE, CCLDeviceCompartment.ADDITIONAL),
     't234c7hum': CCLSensorPreset('CH7 Humidity', CCLSensorTypes.HUMIDITY, CCLDeviceCompartment.ADDITIONAL),
     't234c7tp': CCLSensorPreset('CH7 Type', CCLSensorTypes.CH_SENSOR_TYPE, CCLDeviceCompartment.ADDITIONAL),
-    't6c1wls': CCLSensorPreset('Leakage CH1', CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.ADDITIONAL, True),
+    't6c1wls': CCLSensorPreset('Leakage CH1', CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.ADDITIONAL, True),
     # Status 78-119
     't234c1bat': CCLSensorPreset('Battery: CH1', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
     't234c2bat': CCLSensorPreset('Battery: CH2', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
@@ -170,3 +171,5 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
     't1cn': CCLSensorPreset('Connection: Main Sensor Array', CCLSensorTypes.CONNECTION, CCLDeviceCompartment.STATUS, True),
     't8cn': CCLSensorPreset('Connection: PM2.5/10', CCLSensorTypes.CONNECTION, CCLDeviceCompartment.STATUS, True),
 }
+
+CCL_LEVEL_SENSORS = (CCLSensorTypes.VOC, CCLSensorTypes.BATTERY)
