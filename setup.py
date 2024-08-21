@@ -1,7 +1,7 @@
 from pathlib import Path
 from setuptools import find_packages, setup
 
-VERSION = "2024.8.4"
+VERSION = "2024.8.5"
 
 ROOT_DIR = Path(__file__).parent.resolve()
 

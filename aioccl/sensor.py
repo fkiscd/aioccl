@@ -9,7 +9,7 @@ class CCLSensor:
     
     def __init__(self, key: str):
         """Initialize a CCL sensor."""
-        self._value: None | str | int | float
+        self._value: None | str | int | float = None
     
         if key in CCL_SENSORS.keys():
             self._key = key
@@ -36,12 +36,18 @@ class CCLSensor:
         return CCL_SENSORS[self._key].binary
 
     @property
-    def value(self):
+    def value(self) -> None | str | int | float:
         if self.sensor_type == CCLSensorTypes.CH_SENSOR_TYPE:
             return CCL_CH_SENSOR_TYPES.get(self._value)
         elif self.sensor_type in CCL_LEVEL_SENSORS:
             return 'Lv ' + self._value
-        return self._value
+        try:
+            return int(self._value)
+        except ValueError:
+            try:
+                return float(self._value)
+            except ValueError:
+                return self._value
     
     @value.setter
     def value(self, new_value):
@@ -153,8 +159,8 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
     't234c7bat': CCLSensorPreset('Battery: CH7', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
     't11bat': CCLSensorPreset('Battery: CO', CCLSensorTypes.BATTERY, CCLDeviceCompartment.STATUS),
     't10bat': CCLSensorPreset('Battery: CO\u2082', CCLSensorTypes.BATTERY, CCLDeviceCompartment.STATUS),
-    'inbat': CCLSensorPreset('Battery: Console', CCLSensorTypes.BATTERY_BINARY, True),
-    't9bat': CCLSensorPreset('Battery:Formaldehyde/VOC', CCLSensorTypes.BATTERY, CCLDeviceCompartment.STATUS),
+    'inbat': CCLSensorPreset('Battery: Console', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
+    't9bat': CCLSensorPreset('Battery: Formaldehyde/VOC', CCLSensorTypes.BATTERY, CCLDeviceCompartment.STATUS),
     't6c1bat': CCLSensorPreset('Battery: Leakage CH1', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
     't1bat': CCLSensorPreset('Battery: Main Sensor Array', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
     't8bat': CCLSensorPreset('Battery: PM2.5/10', CCLSensorTypes.BATTERY, CCLDeviceCompartment.STATUS),
