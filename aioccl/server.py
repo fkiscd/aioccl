@@ -81,7 +81,7 @@ class CCLServer:
         finally:
             return web.Response(status=_status, text=_text)
 
-    #app = web.Application()
+    app = web.Application()
 
     cors = aiohttp_cors.setup(app)
 
