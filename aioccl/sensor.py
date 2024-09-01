@@ -37,8 +37,8 @@ class CCLSensor:
 
     @property
     def value(self) -> None | str | int | float:
-        if self.sensor_type in CCL_SENSOR_VALUES:
-            return CCL_SENSOR_VALUES.get(self.sensor_type).get(self._value)
+        if self.sensor_type.name in CCL_SENSOR_VALUES:
+            return CCL_SENSOR_VALUES[self.sensor_type.name].get(self._value)
         elif self.sensor_type == CCLSensorTypes.BATTERY_BINARY:
             return self._value - 1
         elif self.sensor_type in CCL_LEVEL_SENSORS:
