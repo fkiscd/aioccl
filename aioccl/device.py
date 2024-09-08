@@ -9,7 +9,7 @@ from .sensor import CCLSensor, CCL_SENSORS
 
 _LOGGER = logging.getLogger(__name__)
 
-CCL_DEVICE_INFO_TYPES = ("serial_no", "mac_address", "model", "version")
+CCL_DEVICE_INFO_TYPES = ("serial_no", "mac_address", "model", "fw_ver")
 
 class CCLDevice:
     def __init__(self, passkey: str):
@@ -44,10 +44,6 @@ class CCLDevice:
         return self._model + " - " + self.device_id
     
     @property
-    def serial_no(self) -> str | None:
-        return self._serial_no
-    
-    @property
     def mac_address(self) -> str | None:
         return self._mac_address
     
@@ -69,7 +65,6 @@ class CCLDevice:
     
     def update_info(self, info: dict[str, None | str]) -> None:
         """Add or update device info."""
-        self._serial_no = info.get('serial_no')
         self._mac_address = info.get('mac_address')
         self._model = info.get('model')
         self._fw_ver = info.get('fw_ver')

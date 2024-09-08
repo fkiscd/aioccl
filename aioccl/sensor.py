@@ -46,14 +46,8 @@ class CCLSensor:
                 return int(self._value) - 1
             except ValueError:
                 pass
-        
-        try:
-            return int(self._value)
-        except ValueError:
-            try:
-                return float(self._value)
-            except ValueError:
-                return self._value
+        else:
+            return self._value
     
     @value.setter
     def value(self, new_value):
@@ -88,9 +82,9 @@ class CCLSensorTypes(enum.Enum):
     AQI = 19
     LEAKAGE = 20
     BATTERY = 21
-    DISTANCE = 22
-    DURATION = 23
-    FREQUENCY_NU = 24
+    LIGHTNING_DISTANCE = 22
+    LIGHTNING_DURATION = 23
+    LIGHTNING_FREQUENCY = 24
     
 class CCLDeviceCompartment(enum.Enum):
     MAIN = 'Console and Sensor Array'
@@ -173,10 +167,14 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
     't6c5wls': CCLSensorPreset('Leakage CH5', CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER),
     't6c6wls': CCLSensorPreset('Leakage CH6', CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER),
     't6c7wls': CCLSensorPreset('Leakage CH7', CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER),
-    't5lskm': CCLSensorPreset('Lightning Distance', CCLSensorTypes.DISTANCE, CCLDeviceCompartment.OTHER),
-    't5lst': CCLSensorPreset('Lightning: Last Strike', CCLSensorTypes.DURATION, CCLDeviceCompartment.OTHER),
-    't5lsf': CCLSensorPreset('Lightning: Hourly Strikes', CCLSensorTypes.FREQUENCY_NU, CCLDeviceCompartment.OTHER),
-    't5ls1dtc': CCLSensorPreset('Lightning: Daily Strikes', CCLSensorTypes.FREQUENCY_NU, CCLDeviceCompartment.OTHER),
+    't5lskm': CCLSensorPreset('Lightning Distance', CCLSensorTypes.LIGHTNING_DISTANCE, CCLDeviceCompartment.OTHER),
+    't5lst': CCLSensorPreset('Lightning: Last Strike', CCLSensorTypes.LIGHTNING_DURATION, CCLDeviceCompartment.OTHER),
+    't5lsf': CCLSensorPreset('Lightning: Past 60 mins Strikes', CCLSensorTypes.LIGHTNING_FREQUENCY, CCLDeviceCompartment.OTHER),
+    't5ls30mtc': CCLSensorPreset('Lightning: Strikes in 30 mins', CCLSensorTypes.LIGHTNING_FREQUENCY, CCLDeviceCompartment.OTHER),
+    't5ls5mtc': CCLSensorPreset('Lightning: Strikes in 5 mins', CCLSensorTypes.LIGHTNING_FREQUENCY, CCLDeviceCompartment.OTHER),
+    't5ls1dtc': CCLSensorPreset('Lightning: Strikes in day', CCLSensorTypes.LIGHTNING_FREQUENCY, CCLDeviceCompartment.OTHER),
+    't5ls1htc': CCLSensorPreset('Lightning: Strikes in hour', CCLSensorTypes.LIGHTNING_FREQUENCY, CCLDeviceCompartment.OTHER),
+    
     # Status 78-119
     't234c1bat': CCLSensorPreset('Battery: CH1', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
     't234c2bat': CCLSensorPreset('Battery: CH2', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
