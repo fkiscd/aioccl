@@ -40,7 +40,7 @@ class CCLSensor:
         if self.sensor_type.name in CCL_SENSOR_VALUES:
             return CCL_SENSOR_VALUES[self.sensor_type.name].get(self._value)
         elif self.sensor_type in CCL_LEVEL_SENSORS:
-            return 'Lv ' + self._value
+            return 'Lv ' + str(self._value)
         elif self.sensor_type == CCLSensorTypes.BATTERY_BINARY:
             try:
                 return int(self._value) - 1
@@ -93,13 +93,13 @@ class CCLDeviceCompartment(enum.Enum):
 
 CCL_SENSOR_VALUES: dict[str, dict[str, str]] = {
     'CH_SENSOR_TYPE': {
-        '2': 'Thermo-Hygro',
-        '3': 'Pool',
-        '4': 'Soil',
+        2: 'Thermo-Hygro',
+        3: 'Pool',
+        4: 'Soil',
     },
     'LEAKAGE': {
-        '0': 'No Leak',
-        '1': 'Leaking',
+        0: 'No Leak',
+        1: 'Leaking',
     }
 }
 
