@@ -192,7 +192,7 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
     't6c7bat': CCLSensorPreset('Battery: Leakage CH7', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
     't5lsbat': CCLSensorPreset('Battery: Lightning Sensor', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
     't1bat': CCLSensorPreset('Battery: Sensor Array', CCLSensorTypes.BATTERY_BINARY, CCLDeviceCompartment.STATUS, True),
-    't1batvt': CCLSensorPreset('Battery Voltage: Sensor Array', CCLSensorTypes.BATTERY_VOLTAGE, CCLDeviceCompartment.STATUS, True),
+    't1batvt': CCLSensorPreset('Battery Voltage: Sensor Array', CCLSensorTypes.BATTERY_VOLTAGE, CCLDeviceCompartment.STATUS),
     't8bat': CCLSensorPreset('Battery Level: PM2.5/10', CCLSensorTypes.BATTERY, CCLDeviceCompartment.STATUS),
     't234c1cn': CCLSensorPreset('Connection: CH1', CCLSensorTypes.CONNECTION, CCLDeviceCompartment.STATUS, True),
     't234c2cn': CCLSensorPreset('Connection: CH2', CCLSensorTypes.CONNECTION, CCLDeviceCompartment.STATUS, True),
