@@ -92,13 +92,13 @@ class CCLDeviceCompartment(enum.Enum):
 
 CCL_SENSOR_VALUES: dict[str, dict[str, str]] = {
     'CH_SENSOR_TYPE': {
-        2: 'Thermo-Hygro',
-        3: 'Pool',
-        4: 'Soil',
+        2: 'thermo-hygro',
+        3: 'pool',
+        4: 'soil',
     },
     'LEAKAGE': {
-        0: 'No Leak',
-        1: 'Leaking',
+        0: 'no_leak',
+        1: 'leaking',
     }
 }
 
