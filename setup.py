@@ -1,7 +1,9 @@
+"""Setup module for aioCCL."""
+
 from pathlib import Path
 from setuptools import find_packages, setup
 
-VERSION = "2024.9.8"
+VERSION = "2024.10"
 
 ROOT_DIR = Path(__file__).parent.resolve()
 
