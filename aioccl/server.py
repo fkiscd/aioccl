@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 
 from aiohttp import web
-import aiohttp_cors
 
 from .device import CCLDevice, CCL_DEVICE_INFO_TYPES
 from .sensor import CCL_SENSORS
@@ -90,20 +89,8 @@ class CCLServer:
             return web.Response(status=_status, text=_text)
 
     app = web.Application()
-
-    cors = aiohttp_cors.setup(app)
-
-    resource = cors.add(app.router.add_resource("/{passkey}"))
-    route = cors.add(
-        resource.add_route("POST", _handler),
-        {
-            "*": aiohttp_cors.ResourceOptions(
-                allow_credentials=True,
-                expose_headers="*",
-                allow_headers="*",
-            )
-        },
-    )
+    
+    app.add_routes([web.get('/{passkey}', _handler)])
 
     @staticmethod
     async def run() -> None:
