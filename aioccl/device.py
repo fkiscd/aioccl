@@ -16,21 +16,22 @@ CCL_DEVICE_INFO_TYPES = ("serial_no", "mac_address", "model", "fw_ver")
 class CCLDevice:
     """Mapping for a CCL device."""
     _binary_sensors: dict[str, CCLSensor] | None = {}
-    _fw_ver: str | None
-    _last_updated_time: float | None
-    _mac_address: str | None
-    _model: str | None
+    _device_id: str | None = None
+    _fw_ver: str | None = None
+    _last_updated_time: float | None = None
+    _mac_address: str | None = None
+    _model: str | None = None
     _new_binary_sensor_callbacks = set()
     _new_sensors: list[CCLSensor] | None = []
     _new_sensor_callbacks = set()
+    _passkey = ''
     _sensors: dict[str, CCLSensor] | None = {}
-    _serial_no: str | None
+    _serial_no: str | None = None
     _update_callbacks = set()
     
 
     def __init__(self, passkey: str):
         """Initialize a CCL device."""
-        _LOGGER.debug("Initializing CCL Device: %s", self)
         self._passkey = passkey
 
     @property
@@ -41,12 +42,18 @@ class CCLDevice:
     @property
     def device_id(self) -> str | None:
         """Return the device ID."""
-        return self._mac_address.replace(":", "").lower()[-6:]
+        try:
+            self._device_id = self._mac_address.replace(":", "").lower()[-6:]
+        except Exception:  # pylint: disable=broad-exception-caught
+            return None
+        return self._device_id
 
     @property
     def name(self) -> str | None:
         """Return the display name."""
-        return self._model + " - " + self.device_id
+        if self._device_id is not None:
+            return self._model + " - " + self._device_id
+        return self._model
 
     @property
     def mac_address(self) -> str | None:
@@ -133,7 +140,6 @@ class CCLDevice:
         """Schedule call all registered callbacks."""
         for sensor in self._new_sensors[:]:
             try:
-                _LOGGER.debug("Publishing new sensor: %s", sensor)
                 if sensor.binary:
                     for callback in self._new_binary_sensor_callbacks:
                         callback(sensor)

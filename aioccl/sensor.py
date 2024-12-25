@@ -34,8 +34,9 @@ class CCLSensor:
     @property
     def compartment(self) -> None | str:
         """Decide which compartment it belongs to."""
-        if CCL_SENSORS[self._key].compartment:
+        if isinstance(CCL_SENSORS[self._key].compartment, CCLDeviceCompartment):
             return CCL_SENSORS[self._key].compartment.value
+        return None
 
     @property
     def binary(self) -> bool:
@@ -47,14 +48,12 @@ class CCLSensor:
         """Return the intrinsic sensor value."""
         if self.sensor_type.name in CCL_SENSOR_VALUES:
             return CCL_SENSOR_VALUES[self.sensor_type.name].get(self._value)
-        elif self.sensor_type == CCLSensorTypes.BATTERY_BINARY:
+        if self.sensor_type == CCLSensorTypes.BATTERY_BINARY:
             try:
-                x = int(self._value) - 1
-                return x
+                return int(self._value) - 1
             except ValueError:
                 pass
-        else:
-            return self._value
+        return self._value
 
     @value.setter
     def value(self, new_value):
@@ -67,7 +66,7 @@ class CCLSensorPreset:
 
     name: str
     sensor_type: str
-    compartment: None | CCLDeviceCompartment = None
+    compartment: CCLDeviceCompartment | None = None
     binary: bool = False
 
 
