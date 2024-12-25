@@ -34,7 +34,7 @@ class CCLSensor:
     @property
     def compartment(self) -> None | str:
         """Decide which compartment it belongs to."""
-        if isinstance(CCL_SENSORS[self._key].compartment, CCLDeviceCompartment):
+        if CCL_SENSORS[self._key].compartment in CCLDeviceCompartment:
             return CCL_SENSORS[self._key].compartment.value
         return None
 
