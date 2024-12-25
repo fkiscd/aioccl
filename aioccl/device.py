@@ -12,26 +12,23 @@ _LOGGER = logging.getLogger(__name__)
 
 CCL_DEVICE_INFO_TYPES = ("serial_no", "mac_address", "model", "fw_ver")
 
-
 class CCLDevice:
     """Mapping for a CCL device."""
-    _binary_sensors: dict[str, CCLSensor] | None = {}
-    _device_id: str | None = None
-    _fw_ver: str | None = None
-    _last_updated_time: float | None = None
-    _mac_address: str | None = None
-    _model: str | None = None
-    _new_binary_sensor_callbacks = set()
-    _new_sensors: list[CCLSensor] | None = []
-    _new_sensor_callbacks = set()
-    _passkey = ''
-    _sensors: dict[str, CCLSensor] | None = {}
-    _serial_no: str | None = None
-    _update_callbacks = set()    
-
     def __init__(self, passkey: str):
         """Initialize a CCL device."""
+        self._binary_sensors: dict[str, CCLSensor] | None = {}
+        self._device_id: str | None = None
+        self._fw_ver: str | None = None
+        self._last_updated_time: float | None = None
+        self._mac_address: str | None = None
+        self._model: str | None = None
+        self._new_binary_sensor_callbacks = set()
+        self._new_sensors: list[CCLSensor] | None = []
+        self._new_sensor_callbacks = set()
         self._passkey = passkey
+        self._sensors: dict[str, CCLSensor] | None = {}
+        self._serial_no: str | None = None
+        self._update_callbacks = set()
 
     @property
     def passkey(self) -> str:
@@ -42,7 +39,7 @@ class CCLDevice:
     def device_id(self) -> str | None:
         """Return the device ID."""
         try:
-            self._device_id = self._mac_address.replace(":", "").lower()[-6:]
+            self._device_id = self.mac_address.replace(":", "").lower()[-6:]
         except Exception:  # pylint: disable=broad-exception-caught
             return None
         return self._device_id
@@ -50,8 +47,8 @@ class CCLDevice:
     @property
     def name(self) -> str | None:
         """Return the display name."""
-        if self._device_id is not None:
-            return self._model + " - " + self._device_id
+        if self.device_id is not None:
+            return self.model + " - " + self.device_id
         return self._model
 
     @property
