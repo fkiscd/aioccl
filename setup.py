@@ -3,7 +3,7 @@
 from pathlib import Path
 from setuptools import find_packages, setup
 
-VERSION = "2024.12.7"
+VERSION = "2024.12.8"
 
 ROOT_DIR = Path(__file__).parent.resolve()
 
@@ -20,8 +20,7 @@ setup(
   url="https://github.com/fkiscd/aioccl",
   download_url="https://github.com/fkiscd/aioccl",
   install_requires=[
-          "aiohttp>3",
-          "aiohttp_cors>=0.7.0"
+          "aiohttp>3"
       ],
   include_package_data=True,
   classifiers=[

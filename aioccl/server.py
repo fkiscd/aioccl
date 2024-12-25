@@ -61,7 +61,6 @@ class CCLServer:
             _LOGGER.debug("Request exception occured: %s", err)
             return web.Response(status=_status, text=_text)
 
-        
         for key, value in _body.items():
             if key in CCL_DEVICE_INFO_TYPES:
                 _info.setdefault(key, value)
