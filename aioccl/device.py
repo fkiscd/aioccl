@@ -27,8 +27,7 @@ class CCLDevice:
     _passkey = ''
     _sensors: dict[str, CCLSensor] | None = {}
     _serial_no: str | None = None
-    _update_callbacks = set()
-    
+    _update_callbacks = set()    
 
     def __init__(self, passkey: str):
         """Initialize a CCL device."""
