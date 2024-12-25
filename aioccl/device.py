@@ -1,4 +1,5 @@
 """CCL device mapping."""
+
 from __future__ import annotations
 
 import logging
@@ -11,72 +12,75 @@ _LOGGER = logging.getLogger(__name__)
 
 CCL_DEVICE_INFO_TYPES = ("serial_no", "mac_address", "model", "fw_ver")
 
+
 class CCLDevice:
+    """Mapping for a CCL device."""
+
+    _serial_no: str | None
+    _mac_address: str | None
+    _model: str | None
+    _fw_ver: str | None
+    _binary_sensors: dict[str, CCLSensor] | None = {}
+    _sensors: dict[str, CCLSensor] | None = {}
+    _last_updated_time: float | None
+
+    _new_sensors: list[CCLSensor] | None = []
+
+    _update_callbacks = set()
+    _new_binary_sensor_callbacks = set()
+    _new_sensor_callbacks = set()
+
     def __init__(self, passkey: str):
         """Initialize a CCL device."""
-        _LOGGER.debug('Initializing CCL Device: %s', self)
+        _LOGGER.debug("Initializing CCL Device: %s", self)
         self._passkey = passkey
-        
-        self._serial_no: str | None
-        self._mac_address: str | None
-        self._model: str | None
-        self._fw_ver: str | None
-        self._binary_sensors: dict[str, CCLSensor] | None = {}
-        self._sensors: dict[str, CCLSensor] | None = {}
-        self._last_updated_time: float | None
 
-        self._new_sensors: list[CCLSensor] | None = []
-        
-        self._update_callbacks = set() 
-        self._new_binary_sensor_callbacks = set()
-        self._new_sensor_callbacks = set()
-    
     @property
     def passkey(self) -> str:
         """Return the passkey."""
         return self._passkey
-    
+
     @property
     def device_id(self) -> str | None:
         """Return the device ID."""
         return self._mac_address.replace(":", "").lower()[-6:]
-    
+
     @property
     def name(self) -> str | None:
         """Return the display name."""
         return self._model + " - " + self.device_id
-    
+
     @property
     def mac_address(self) -> str | None:
         """Return the MAC address."""
         return self._mac_address
-    
+
     @property
     def model(self) -> str | None:
         """Return the model."""
         return self._model
-    
+
     @property
     def fw_ver(self) -> str | None:
         """Return the firmware version."""
         return self._fw_ver
-    
+
     @property
     def binary_sensors(self) -> dict[str, CCLSensor] | None:
         """Store binary sensor data under this device."""
         return self._binary_sensors
-    
+
     @property
     def sensors(self) -> dict[str, CCLSensor] | None:
         """Store sensor data under this device."""
         return self._sensors
-    
+
     def update_info(self, info: dict[str, None | str]) -> None:
         """Add or update device info."""
-        self._mac_address = info.get('mac_address')
-        self._model = info.get('model')
-        self._fw_ver = info.get('fw_ver')
-    
+        self._mac_address = info.get("mac_address")
+        self._model = info.get("model")
+        self._fw_ver = info.get("fw_ver")
+
     def update_sensors(self, sensors: dict[str, None | str | int | float]) -> None:
         """Add or update all sensor values."""
         for key, value in sensors.items():
@@ -108,7 +112,7 @@ class CCLDevice:
         try:
             for callback in self._update_callbacks:
                 callback()
-        except Exception as err: # pylint: disable=broad-exception-caught
+        except Exception as err:  # pylint: disable=broad-exception-caught
             _LOGGER.warning("Error while publishing sensor updates: %s", err)
 
     def register_new_binary_sensor_cb(self, callback: Callable[[], None]) -> None:
@@ -139,5 +143,5 @@ class CCLDevice:
                     for callback in self._new_sensor_callbacks:
                         callback(sensor)
                 self._new_sensors.remove(sensor)
-            except Exception as err: # pylint: disable=broad-exception-caught
+            except Exception as err:  # pylint: disable=broad-exception-caught
                 _LOGGER.warning("Error while publishing new sensors: %s", err)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Callable
 
 from aiohttp import web
 
@@ -20,13 +21,16 @@ class CCLServer:
     devices: dict[str, CCLDevice] = {}
 
     @staticmethod
-    def add_copy(device: CCLDevice) -> None:
-        """Attach a device copy to the server."""
+    def register(device: CCLDevice) -> None:
+        """Register a device with a passkey."""
         CCLServer.devices.setdefault(device.passkey, device)
         _LOGGER.debug(CCLServer.devices)
 
-    # routes = web.RouteTableDef()
-
+    @staticmethod
+    def get_handler() -> Callable[[web.BaseRequest], web.Response]:
+        """Get the handler."""
+        return CCLServer._handler
+    
     @staticmethod
     async def _handler(request: web.BaseRequest) -> web.Response:
         """Handle POST requests for data updating."""
@@ -89,15 +93,14 @@ class CCLServer:
             return web.Response(status=_status, text=_text)
 
     app = web.Application()
-    
     app.add_routes([web.get('/{passkey}', _handler)])
+    runner = web.AppRunner(app)
 
     @staticmethod
     async def run() -> None:
-        """Try to run the API server in case none is available."""
+        """Try to run the API server."""
         try:
             _LOGGER.debug("Trying to start the API server.")
-            CCLServer.runner = web.AppRunner(CCLServer.app)
             await CCLServer.runner.setup()
             site = web.TCPSite(CCLServer.runner, port=CCLServer.LISTEN_PORT)
             await site.start()
