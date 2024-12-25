@@ -13,7 +13,7 @@ class CCLSensor:
         """Initialize a CCL sensor."""
         self._value: None | str | int | float = None
 
-        if key in CCL_SENSORS.keys():
+        if key in CCL_SENSORS:
             self._key = key
 
     @property
@@ -49,7 +49,8 @@ class CCLSensor:
             return CCL_SENSOR_VALUES[self.sensor_type.name].get(self._value)
         elif self.sensor_type == CCLSensorTypes.BATTERY_BINARY:
             try:
-                return int(self._value) - 1
+                x = int(self._value) - 1
+                return x
             except ValueError:
                 pass
         else:
