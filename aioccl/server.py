@@ -24,7 +24,7 @@ class CCLServer:
     def register(device: CCLDevice) -> None:
         """Register a device with a passkey."""
         CCLServer.devices.setdefault(device.passkey, device)
-        _LOGGER.debug("Device registered: %s", CCLServer.devices)
+        _LOGGER.debug("Device registered: %s", device)
 
     @staticmethod
     def get_handler() -> Callable[[web.BaseRequest], web.Response]:
@@ -43,10 +43,11 @@ class CCLServer:
         _text: None | str = None
 
         try:
-            for passkey, _device in CCLServer.devices.items():
+            for passkey in CCLServer.devices:
                 if passkey == request.match_info["passkey"]:
                     _passkey = passkey
                     break
+            _device = CCLServer.devices[_passkey]
             assert _device, 404
 
             assert request.content_type == "application/json", 400
