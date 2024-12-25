@@ -43,7 +43,7 @@ class CCLServer:
                 if passkey == _passkey:
                     _device = CCLServer.devices[_passkey]
                     break
-            assert _device, 404
+            assert isinstance(_device, CCLDevice), 404
 
             assert request.content_type == "application/json", 400
             assert 0 < request.content_length <= 5000, 400
@@ -77,7 +77,7 @@ class CCLServer:
         return web.Response(status=_status, text=_text)
 
     app = web.Application()
-    app.add_routes([web.get('/{passkey}', _handler)])
+    app.add_routes([web.get('/{passkey}', handler)])
     runner = web.AppRunner(app)
 
     @staticmethod
