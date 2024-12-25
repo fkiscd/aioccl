@@ -24,7 +24,7 @@ class CCLServer:
     def register(device: CCLDevice) -> None:
         """Register a device with a passkey."""
         CCLServer.devices.setdefault(device.passkey, device)
-        _LOGGER.debug(CCLServer.devices)
+        _LOGGER.debug("Device registered: %s", CCLServer.devices)
 
     @staticmethod
     def get_handler() -> Callable[[web.BaseRequest], web.Response]:
@@ -34,37 +34,25 @@ class CCLServer:
     @staticmethod
     async def _handler(request: web.BaseRequest) -> web.Response:
         """Handle POST requests for data updating."""
-
-        class HandlerStorage:
-            """Store data for a single request."""
-
-            body: dict[str, None | str | int | float]
-            info: dict[str, None | str]
-            sensors: dict[str, None | str | int | float]
-
-        _LOGGER.debug("Request received.")
-
-        # Resetting variables
+        _body: dict[str, None | str | int | float] = {}
         _device: CCLDevice = None
-
-        HandlerStorage.body = {}
-        HandlerStorage.info = {}
-        HandlerStorage.sensors = {}
-
+        _info: dict[str, None | str] = {}
+        _passkey: str = ''
+        _sensors: dict[str, None | str | int | float] = {}
         _status: None | int = None
         _text: None | str = None
 
         try:
             for passkey, _device in CCLServer.devices.items():
                 if passkey == request.match_info["passkey"]:
+                    _passkey = passkey
                     break
             assert _device, 404
 
             assert request.content_type == "application/json", 400
             assert 0 < request.content_length <= 5000, 400
 
-            HandlerStorage.body = await request.json()
-            _LOGGER.debug(HandlerStorage.body)
+            _body = await request.json()
 
         except Exception as err:  # pylint: disable=broad-exception-caught
             _status = err.args[0]
@@ -78,19 +66,19 @@ class CCLServer:
             _LOGGER.debug("Request exception occured: %s", err)
             return web.Response(status=_status, text=_text)
 
-        else:
-            for key, value in HandlerStorage.body.items():
-                if key in CCL_DEVICE_INFO_TYPES:
-                    HandlerStorage.info.setdefault(key, value)
-                elif key in CCL_SENSORS:
-                    HandlerStorage.sensors.setdefault(key, value)
+        
+        for key, value in _body.items():
+            if key in CCL_DEVICE_INFO_TYPES:
+                _info.setdefault(key, value)
+            elif key in CCL_SENSORS:
+                _sensors.setdefault(key, value)
 
-            _device.update_info(HandlerStorage.info)
-            _device.update_sensors(HandlerStorage.sensors)
-            _status = 200
-            _text = "200 OK"
-            _LOGGER.debug("Request processed.")
-            return web.Response(status=_status, text=_text)
+        _device.update_info(_info)
+        _device.update_sensors(_sensors)
+        _status = 200
+        _text = "200 OK"
+        _LOGGER.debug("Request processed: %s", _passkey)
+        return web.Response(status=_status, text=_text)
 
     app = web.Application()
     app.add_routes([web.get('/{passkey}', _handler)])

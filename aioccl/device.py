@@ -15,20 +15,18 @@ CCL_DEVICE_INFO_TYPES = ("serial_no", "mac_address", "model", "fw_ver")
 
 class CCLDevice:
     """Mapping for a CCL device."""
-
-    _serial_no: str | None
+    _binary_sensors: dict[str, CCLSensor] | None = {}
+    _fw_ver: str | None
+    _last_updated_time: float | None
     _mac_address: str | None
     _model: str | None
-    _fw_ver: str | None
-    _binary_sensors: dict[str, CCLSensor] | None = {}
-    _sensors: dict[str, CCLSensor] | None = {}
-    _last_updated_time: float | None
-
-    _new_sensors: list[CCLSensor] | None = []
-
-    _update_callbacks = set()
     _new_binary_sensor_callbacks = set()
+    _new_sensors: list[CCLSensor] | None = []
     _new_sensor_callbacks = set()
+    _sensors: dict[str, CCLSensor] | None = {}
+    _serial_no: str | None
+    _update_callbacks = set()
+    
 
     def __init__(self, passkey: str):
         """Initialize a CCL device."""
