@@ -96,7 +96,7 @@ class CCLDevice:
 
     def update_info(self, new_info: dict[str, None | str]) -> None:
         """Add or update device info."""
-        for key, value in new_info:
+        for key, value in new_info.items():
             if key in self._info:
                 self._info[key] = str(value)
         self._info["last_update_time"] = time.monotonic()
@@ -142,7 +142,7 @@ class CCLDevice:
     def _publish_updates(self) -> int:
         """Schedule call all registered callbacks."""
         count = 0
-        for sensor, callback in self._update_callbacks:
+        for sensor, callback in self._update_callbacks.items():
             try:
                 callback()
                 count += 1

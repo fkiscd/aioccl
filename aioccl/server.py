@@ -23,56 +23,57 @@ class CCLServer:
     def register(device: CCLDevice) -> None:
         """Register a device with a passkey."""
         CCLServer.devices.setdefault(device.passkey, device)
-        _LOGGER.debug("Device registered: %s", device)
+        _LOGGER.debug("Device registered: %s", device.passkey)
 
     @staticmethod
     async def handler(request: web.BaseRequest | web.Request) -> web.Response:
         """Handle POST requests for data updating."""
-        _body: dict[str, None | str | int | float] = {}
-        _device: CCLDevice = None
-        _info: dict[str, None | str] = {}
-        _passkey: str = ""
-        _sensors: dict[str, None | str | int | float] = {}
-        _status: None | int = None
-        _text: None | str = None
+        body: dict[str, None | str | int | float] = {}
+        device: CCLDevice = None
+        info: dict[str, None | str] = {}
+        target_passkey: str = ""
+        sensors: dict[str, None | str | int | float] = {}
+        status: None | int = None
+        text: None | str = None
 
+        _LOGGER.debug("Request received: %s", target_passkey)
         try:
-            _passkey = request.path[-8:]
-            for passkey in CCLServer.devices:
-                if passkey == _passkey:
-                    _device = CCLServer.devices[_passkey]
+            target_passkey = request.path[-8:]
+            for passkey in CCLServer.devices.items():
+                if passkey == target_passkey:
+                    device = CCLServer.devices[passkey]
                     break
-            assert isinstance(_device, CCLDevice), 404
+            assert isinstance(device, CCLDevice), 404
 
             assert request.content_type == "application/json", 400
             assert 0 < request.content_length <= 5000, 400
 
-            _body = await request.json()
+            body = await request.json()
 
         except Exception as err:  # pylint: disable=broad-exception-caught
-            _status = err.args[0]
-            if _status == 400:
-                _text = "400 Bad Request"
-            elif _status == 404:
-                _text = "404 Not Found"
+            status = err.args[0]
+            if status == 400:
+                text = "400 Bad Request"
+            elif status == 404:
+                text = "404 Not Found"
             else:
-                _status = 500
-                _text = "500 Internal Server Error"
+                status = 500
+                text = "500 Internal Server Error"
             _LOGGER.debug("Request exception occured: %s", err)
-            return web.Response(status=_status, text=_text)
+            return web.Response(status=status, text=text)
 
-        for key, value in _body.items():
+        for key, value in body.items():
             if key in CCL_DEVICE_INFO_TYPES:
-                _info.setdefault(key, value)
+                info.setdefault(key, value)
             elif key in CCL_SENSORS:
-                _sensors.setdefault(key, value)
+                sensors.setdefault(key, value)
 
-        _device.update_info(_info)
-        _device.update_sensors(_sensors)
-        _status = 200
-        _text = "200 OK"
-        _LOGGER.debug("Request processed: %s", _passkey)
-        return web.Response(status=_status, text=_text)
+        device.update_info(info)
+        device.update_sensors(sensors)
+        status = 200
+        text = "200 OK"
+        _LOGGER.debug("Request processed: %s", target_passkey)
+        return web.Response(status=status, text=text)
 
     app = web.Application()
     app.add_routes([web.get("/{passkey}", handler)])
