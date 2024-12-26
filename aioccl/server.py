@@ -24,14 +24,14 @@ class CCLServer:
         """Register a device with a passkey."""
         CCLServer.devices.setdefault(device.passkey, device)
         _LOGGER.debug("Device registered: %s", device)
-    
+
     @staticmethod
     async def handler(request: web.BaseRequest | web.Request) -> web.Response:
         """Handle POST requests for data updating."""
         _body: dict[str, None | str | int | float] = {}
         _device: CCLDevice = None
         _info: dict[str, None | str] = {}
-        _passkey: str = ''
+        _passkey: str = ""
         _sensors: dict[str, None | str | int | float] = {}
         _status: None | int = None
         _text: None | str = None
@@ -75,7 +75,7 @@ class CCLServer:
         return web.Response(status=_status, text=_text)
 
     app = web.Application()
-    app.add_routes([web.get('/{passkey}', handler)])
+    app.add_routes([web.get("/{passkey}", handler)])
     runner = web.AppRunner(app)
 
     @staticmethod
