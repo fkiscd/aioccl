@@ -31,17 +31,17 @@ class CCLServer:
         body: dict[str, None | str | int | float] = {}
         device: CCLDevice = None
         info: dict[str, None | str] = {}
-        target_passkey: str = ""
+        passkey: str = ""
         sensors: dict[str, None | str | int | float] = {}
         status: None | int = None
         text: None | str = None
 
-        _LOGGER.debug("Request received: %s", target_passkey)
+        _LOGGER.debug("Request received: %s", passkey)
         try:
-            target_passkey = request.path[-8:]
-            for passkey in CCLServer.devices.items():
-                if passkey == target_passkey:
-                    device = CCLServer.devices[passkey]
+            passkey = request.path[-8:]
+            for ref_passkey, ref_device in CCLServer.devices.items():
+                if passkey == ref_passkey:
+                    device = ref_device
                     break
             assert isinstance(device, CCLDevice), 404
 
@@ -72,7 +72,7 @@ class CCLServer:
         device.update_sensors(sensors)
         status = 200
         text = "200 OK"
-        _LOGGER.debug("Request processed: %s", target_passkey)
+        _LOGGER.debug("Request processed: %s", passkey)
         return web.Response(status=status, text=text)
 
     app = web.Application()
