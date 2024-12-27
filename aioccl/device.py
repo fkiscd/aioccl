@@ -131,25 +131,25 @@ class CCLDevice:
             self.last_update_time,
         )
 
-    def register_update_cb(self, sensor, callback: Callable[[], None]) -> None:
+    def register_update_cb(self, sensor_key, callback: Callable[[], None]) -> None:
         """Register callback, called when Sensor changes state."""
-        self._update_callbacks[sensor] = callback
+        self._update_callbacks[sensor_key] = callback
 
-    def remove_update_cb(self, sensor, callback: Callable[[], None]) -> None:
+    def remove_update_cb(self, sensor_key, callback: Callable[[], None]) -> None:
         """Remove previously registered callback."""
-        self._update_callbacks.pop(sensor, None)
+        self._update_callbacks.pop(sensor_key, None)
 
     def _publish_updates(self) -> int:
         """Schedule call all registered callbacks."""
         count = 0
-        for sensor, callback in self._update_callbacks.items():
+        for sensor_key, callback in self._update_callbacks.items():
             try:
                 callback()
                 count += 1
             except Exception as err:  # pylint: disable=broad-exception-caught
                 _LOGGER.warning(
                     "Error while updating sensor %s for device %s: %s",
-                    sensor.key,
+                    sensor_key,
                     self.device_id,
                     err,
                 )
