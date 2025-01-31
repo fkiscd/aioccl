@@ -22,7 +22,7 @@ class CCLServer:
     @staticmethod
     def register(device: CCLDevice) -> None:
         """Register a device with a passkey."""
-        CCLServer.devices.setdefault(device.passkey, device)
+        CCLServer.devices[device.passkey] = device
         _LOGGER.debug("Device registered: %s", device.passkey)
 
     @staticmethod
