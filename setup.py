@@ -17,8 +17,8 @@ setup(
   long_description_content_type="text/markdown",
   author="fkiscd",
   author_email="fkiscd@gmail.com",
-  url="https://github.com/fkiscd/aioccl",
-  download_url="https://github.com/fkiscd/aioccl",
+  url="https://github.com/CCL-Electronics-Ltd/aioccl",
+  download_url="https://github.com/CCL-Electronics-Ltd/aioccl",
   install_requires=[
           "aiohttp>3"
       ],
