@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import enum
-
+from typing import Any
 
 class CCLSensor:
     """Class that represents a CCLSensor object in the aioCCL API."""
@@ -48,11 +48,6 @@ class CCLSensor:
         """Return the intrinsic sensor value."""
         if self.sensor_type.name in CCL_SENSOR_VALUES:
             return CCL_SENSOR_VALUES[self.sensor_type.name].get(self._value)
-        if self.sensor_type == CCLSensorTypes.BATTERY_BINARY:
-            try:
-                return int(self._value) - 1
-            except ValueError:
-                pass
         return self._value
 
     @value.setter
@@ -108,16 +103,24 @@ class CCLDeviceCompartment(enum.Enum):
     STATUS = "Status"
 
 
-CCL_SENSOR_VALUES: dict[str, dict[str, str]] = {
+CCL_SENSOR_VALUES: dict[str, dict[int, Any]] = {
     "CH_SENSOR_TYPE": {
-        2: "thermo-hygro",
-        3: "pool",
-        4: "soil",
+        2: "Thermo-Hygro",
+        3: "Pool",
+        4: "Soil",
     },
-    "LEAKAGE": {
-        0: "no_leak",
-        1: "leaking",
+    "BATTERY_BINARY": {
+        0: 1,
+        1: 0,
     },
+    "BATTERY": {
+        0: 0,
+        1: 0.2,
+        2: 0.4,
+        3: 0.6,
+        4: 0.8,
+        5: 1,
+    }
 }
 
 CCL_SENSORS: dict[str, CCLSensorPreset] = {
@@ -280,25 +283,25 @@ CCL_SENSORS: dict[str, CCLSensorPreset] = {
         "CH7 Type", CCLSensorTypes.CH_SENSOR_TYPE, CCLDeviceCompartment.OTHER
     ),
     "t6c1wls": CCLSensorPreset(
-        "Leakage CH1", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER
+        "Leakage CH1", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER, True
     ),
     "t6c2wls": CCLSensorPreset(
-        "Leakage CH2", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER
+        "Leakage CH2", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER, True
     ),
     "t6c3wls": CCLSensorPreset(
-        "Leakage CH3", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER
+        "Leakage CH3", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER, True
     ),
     "t6c4wls": CCLSensorPreset(
-        "Leakage CH4", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER
+        "Leakage CH4", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER, True
     ),
     "t6c5wls": CCLSensorPreset(
-        "Leakage CH5", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER
+        "Leakage CH5", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER, True
     ),
     "t6c6wls": CCLSensorPreset(
-        "Leakage CH6", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER
+        "Leakage CH6", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER, True
     ),
     "t6c7wls": CCLSensorPreset(
-        "Leakage CH7", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER
+        "Leakage CH7", CCLSensorTypes.LEAKAGE, CCLDeviceCompartment.OTHER, True
     ),
     "t5lskm": CCLSensorPreset(
         "Lightning Distance",

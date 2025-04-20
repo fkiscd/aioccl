@@ -27,6 +27,11 @@ class CCLDevice:
             model: str | None
             passkey: str
             serial_no: str | None
+            
+        class Data(TypedDict):
+            """Store sensor data."""
+            binary_sensors: dict[str, CCLSensor]
+            sensors: dict[str, CCLSensor]
 
         self._info: Info = {
             "fw_ver": None,
@@ -36,10 +41,13 @@ class CCLDevice:
             "passkey": passkey,
             "serial_no": None,
         }
-
-        self._binary_sensors: dict[str, CCLSensor] | None = {}
-        self._sensors: dict[str, CCLSensor] | None = {}
-        self._update_callbacks = {}
+        
+        self._data: Data = {
+            "binary_sensors": {},
+            "sensors": {}
+        }
+        
+        self._update_callback = {}
 
         self._new_binary_sensor_callbacks = set()
         self._new_sensors: list[CCLSensor] | None = []
@@ -85,14 +93,9 @@ class CCLDevice:
         return self._info["fw_ver"]
 
     @property
-    def binary_sensors(self) -> dict[str, CCLSensor] | None:
-        """Store binary sensor data under this device."""
-        return self._binary_sensors
-
-    @property
-    def sensors(self) -> dict[str, CCLSensor] | None:
-        """Store sensor data under this device."""
-        return self._sensors
+    def get_data(self) -> dict[str, dict[str, CCLSensor]]:
+        """Get all types of sensor data under this device."""
+        return self._data
 
     def update_info(self, new_info: dict[str, None | str]) -> None:
         """Add or update device info."""
@@ -101,19 +104,19 @@ class CCLDevice:
                 self._info[key] = str(value)
         self._info["last_update_time"] = time.monotonic()
 
-    def update_sensors(self, sensors: dict[str, None | str | int | float]) -> None:
+    def process_data(self, data: dict[str, None | str | int | float]) -> None:
         """Add or update all sensor values."""
-        for key, value in sensors.items():
+        for key, value in data.items():
             if CCL_SENSORS.get(key).binary:
-                if key not in self.binary_sensors:
-                    self._binary_sensors[key] = CCLSensor(key)
-                    self._new_sensors.append(self.binary_sensors[key])
-                self._binary_sensors[key].value = value
+                if key not in self._data["binary_sensors"]:
+                    self._data["binary_sensors"][key] = CCLSensor(key)
+                    self._new_sensors.append(self._data["binary_sensors"][key])
+                self._data["binary_sensors"][key].value = value
             else:
-                if key not in self.sensors:
-                    self._sensors[key] = CCLSensor(key)
-                    self._new_sensors.append(self.sensors[key])
-                self._sensors[key].value = value
+                if key not in self._data["sensors"]:
+                    self._data["sensors"][key] = CCLSensor(key)
+                    self._new_sensors.append(self._data["sensors"][key])
+                self._data["sensors"][key].value = value
 
         add_count = self._publish_new_sensors()
         _LOGGER.debug(
@@ -123,65 +126,43 @@ class CCLDevice:
             self.last_update_time,
         )
 
-        update_count = self._publish_updates()
+        self._publish_updates()
         _LOGGER.debug(
-            "Updated %s sensors in total for device %s at %s.",
-            update_count,
+            "Updating sensor data for device %s at %s.",
             self.device_id,
             self.last_update_time,
         )
 
-    def register_update_cb(self, sensor_key, callback: Callable[[], None]) -> None:
-        """Register callback, called when Sensor changes state."""
-        self._update_callbacks[sensor_key] = callback
+    def set_update_callback(self, callback: Callable[[], None]) -> None:
+        """Set the callback function to update sensor data."""
+        self._update_callback = callback
 
-    def remove_update_cb(self, sensor_key, callback: Callable[[], None]) -> None:
-        """Remove previously registered callback."""
-        self._update_callbacks.pop(sensor_key, None)
-
-    def _publish_updates(self) -> int:
-        """Schedule call all registered callbacks."""
-        count = 0
-        for sensor_key, callback in self._update_callbacks.items():
-            try:
-                callback()
-                count += 1
-            except Exception as err:  # pylint: disable=broad-exception-caught
-                _LOGGER.warning(
-                    "Error while updating sensor %s for device %s: %s",
-                    sensor_key,
-                    self.device_id,
-                    err,
-                )
-        return count
-
-    def register_new_binary_sensor_cb(self, callback: Callable[[], None]) -> None:
-        """Register callback, called when Sensor changes state."""
-        self._new_binary_sensor_callbacks.add(callback)
-
-    def remove_new_binary_sensor_cb(self, callback: Callable[[], None]) -> None:
-        """Remove previously registered callback."""
-        self._new_binary_sensor_callbacks.discard(callback)
+    def _publish_updates(self) -> None:
+        """Call the function to update sensor data."""
+        try:
+            self._update_callback(self._data)
+        except Exception as err:  # pylint: disable=broad-exception-caught
+            _LOGGER.warning(
+                "Error while updating sensors for device %s: %s",
+                self.device_id,
+                err,
+            )
 
     def register_new_sensor_cb(self, callback: Callable[[], None]) -> None:
-        """Register callback, called when Sensor changes state."""
+        """Register callback of adding a new sensor."""
         self._new_sensor_callbacks.add(callback)
 
     def remove_new_sensor_cb(self, callback: Callable[[], None]) -> None:
-        """Remove previously registered callback."""
+        """Remove a registered callback."""
         self._new_sensor_callbacks.discard(callback)
 
     def _publish_new_sensors(self) -> None:
-        """Schedule call all registered callbacks."""
+        """Schedule all registered callbacks to add new sensors."""
         count = 0
         for sensor in self._new_sensors[:]:
             try:
-                if sensor.binary:
-                    for callback in self._new_binary_sensor_callbacks:
-                        callback(sensor)
-                else:
-                    for callback in self._new_sensor_callbacks:
-                        callback(sensor)
+                for callback in self._new_sensor_callbacks:
+                    callback(sensor)
                 self._new_sensors.remove(sensor)
                 count += 1
             except Exception as err:  # pylint: disable=broad-exception-caught

@@ -29,10 +29,10 @@ class CCLServer:
     async def handler(request: web.BaseRequest | web.Request) -> web.Response:
         """Handle POST requests for data updating."""
         body: dict[str, None | str | int | float] = {}
+        data: dict[str, None | str | int | float] = {}
         device: CCLDevice = None
         info: dict[str, None | str] = {}
         passkey: str = ""
-        sensors: dict[str, None | str | int | float] = {}
         status: None | int = None
         text: None | str = None
 
@@ -66,10 +66,10 @@ class CCLServer:
             if key in CCL_DEVICE_INFO_TYPES:
                 info.setdefault(key, value)
             elif key in CCL_SENSORS:
-                sensors.setdefault(key, value)
+                data.setdefault(key, value)
 
         device.update_info(info)
-        device.update_sensors(sensors)
+        device.process_data(data)
         status = 200
         text = "200 OK"
         _LOGGER.debug("Request processed: %s", passkey)
