@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
 import logging
 
 from aiohttp import web
@@ -43,22 +44,22 @@ class CCLServer:
                 if passkey == ref_passkey:
                     device = ref_device
                     break
-            assert isinstance(device, CCLDevice), 404
+            assert isinstance(device, CCLDevice), HTTPStatus.NOT_FOUND
 
-            assert request.content_type == "application/json", 400
-            assert 0 < request.content_length <= 5000, 400
+            assert request.content_type == "application/json", HTTPStatus.BAD_REQUEST
+            assert 0 < request.content_length <= 5000, HTTPStatus.BAD_REQUEST
 
             body = await request.json()
 
         except Exception as err:  # pylint: disable=broad-exception-caught
             status = err.args[0]
-            if status == 400:
-                text = "400 Bad Request"
-            elif status == 404:
-                text = "404 Not Found"
+            if status == HTTPStatus.BAD_REQUEST:
+                text = "400 Bad Request."
+            elif status == HTTPStatus.NOT_FOUND:
+                text = "404 Not Found."
             else:
-                status = 500
-                text = "500 Internal Server Error"
+                status = HTTPStatus.INTERNAL_SERVER_ERROR
+                text = "500 Internal Server Error."
             _LOGGER.debug("Request exception occured: %s", err)
             return web.Response(status=status, text=text)
 
@@ -70,7 +71,7 @@ class CCLServer:
 
         device.update_info(info)
         device.process_data(data)
-        status = 200
+        status = HTTPStatus.OK
         text = "200 OK"
         _LOGGER.debug("Request processed: %s", passkey)
         return web.Response(status=status, text=text)
